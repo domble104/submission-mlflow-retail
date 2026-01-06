@@ -1,43 +1,36 @@
 name: Training Workflow
 
-# Trigger: Jalan saat ada push ke branch main
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
-  train-model:
+  train-and-commit:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Ambil kodingan dari repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 2. Siapkan Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
 
-    # 3. Install Library MLflow & Kawan-kawan
     - name: Install dependencies
       run: |
         pip install mlflow pandas numpy scikit-learn matplotlib seaborn
 
-    # 4. Jalankan MLflow Project
-    # Perintah ini akan masuk ke folder MLProject dan menjalankan file MLProject
     - name: Run MLflow Project
       run: |
         cd MLProject
-        mlflow run . --no-conda
+        mlflow run . --env-manager local
 
-    # 5. (SKILLED POINT) Simpan Artefak ke Repo
-    # Bagian ini akan meng-commit hasil run (folder mlruns) kembali ke GitHub
-    - name: Commit Artifacts to Repo
+    - name: Commit & Push Artifacts
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
